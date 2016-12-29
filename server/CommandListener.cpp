@@ -230,6 +230,10 @@ CommandListener::CommandListener() :
     createChildChains(V4, "nat", "PREROUTING", NAT_PREROUTING);
     createChildChains(V4, "nat", "POSTROUTING", NAT_POSTROUTING);
 
+    //Drop incoming timestamp requests
+    execIptables(V4, "-w", "-A", "cfw_INPUT", "-p", "ICMP", "--icmp-type", "timestamp-request",
+                 "-j", "DROP", NULL);
+
     // Let each module setup their child chains
     setupOemIptablesHook();
 
