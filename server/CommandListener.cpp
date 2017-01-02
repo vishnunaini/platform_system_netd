@@ -237,6 +237,8 @@ CommandListener::CommandListener() :
                  "-j", "DROP", NULL);
     execIptables(V4, "-w", "-A", "cfw_INPUT", "-p", "ICMP", "--icmp-type", "timestamp-request",
                  "-j", "DROP", NULL);
+    execIptables(V4, "-w", "-A", "cfw_INPUT", "-p", "ICMP", "--icmp-type", "echo-request",
+                 "-j", "DROP", NULL);
 
     execIptables(V4V6, "-w", "-A", "cfw_OUTPUT", "-m", "state", "--state", "INVALID",
                  "-j", "DROP", NULL);
