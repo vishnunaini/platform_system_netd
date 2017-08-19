@@ -118,14 +118,12 @@ static const char* FILTER_INPUT[] = {
         // Bandwidth should always be early in input chain, to make sure we
         // correctly count incoming traffic against data plan.
         BandwidthController::LOCAL_INPUT,
-        "cfw_INPUT",
         FirewallController::LOCAL_INPUT,
         NULL,
 };
 
 static const char* FILTER_FORWARD[] = {
         OEM_IPTABLES_FILTER_FORWARD,
-        "cfw_FORWARD",
         FirewallController::LOCAL_FORWARD,
         BandwidthController::LOCAL_FORWARD,
         NatController::LOCAL_FORWARD,
@@ -134,7 +132,6 @@ static const char* FILTER_FORWARD[] = {
 
 static const char* FILTER_OUTPUT[] = {
         OEM_IPTABLES_FILTER_OUTPUT,
-        "cfw_OUTPUT",
         FirewallController::LOCAL_OUTPUT,
         StrictController::LOCAL_OUTPUT,
         BandwidthController::LOCAL_OUTPUT,
@@ -233,18 +230,12 @@ CommandListener::CommandListener() :
     createChildChains(V4, "nat", "PREROUTING", NAT_PREROUTING);
     createChildChains(V4, "nat", "POSTROUTING", NAT_POSTROUTING);
 
-    execIptables(V4V6, "-w", "-A", "cfw_INPUT", "-m", "state", "--state", "INVALID",
-                 "-j", "DROP", NULL);
+    //Drop incoming timestamp requests
     execIptables(V4, "-w", "-A", "cfw_INPUT", "-p", "ICMP", "--icmp-type", "timestamp-request",
                  "-j", "DROP", NULL);
     execIptables(V4, "-w", "-A", "cfw_INPUT", "-p", "ICMP", "--icmp-type", "echo-request",
                  "-j", "DROP", NULL);
 
-    execIptables(V4V6, "-w", "-A", "cfw_OUTPUT", "-m", "state", "--state", "INVALID",
-                 "-j", "DROP", NULL);
-
-    execIptables(V4V6, "-w", "-A", "cfw_FORWARD", "-m", "state", "--state", "INVALID",
-                 "-j", "DROP", NULL);
     // Let each module setup their child chains
     setupOemIptablesHook();
 
